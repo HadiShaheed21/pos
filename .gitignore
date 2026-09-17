@@ -1,40 +1,78 @@
 node_modules/
-.env
-.env.*
-!.env.example
-
-frontend/.next/
-frontend/out/
-frontend/out 2/
-
 dist/
-build/
-
+release/
+mas-build-output/
 *.db
-*.sqlite
-*.sqlite3
-
+*.db-shm
+*.db-wal
+# Intentional exception: a real committed DB fixture for the upgrade-path
+# regression test (tests/upgrade-path.test.ts, specs/DatabaseMigrations.md).
+!tests/fixtures/upgrade-snapshots/*.db
+backups/
+.env
+.env.local
+.env.*.local
 .DS_Store
+.claude/
+.agents/
+docs/superpowers/
+.superpowers
+.gstack
+# WhatsApp linked-device credentials (Baileys auth state) — never commit
+whatsapp-auth/
+
+# Local pentest reports/PoCs — never commit
+vuln/
+
+# Apple signing assets — NEVER commit
+xcode/
+build/flo.provisionprofile
+*.cer
+*.p12
+*.p8
+*.key
+*.pem
+*.certSigningRequest
+*.provisionprofile
+*.mobileprovision
+
+.next/
+brain/
+
+# Private code-review reports and remediation notes — never commit
+code-review/
+
+# Private shared docs repo — cloned in by hand, never tracked here (see AGENTS.md)
+specs/
+test-results/
+
+# Generated/build files
 node_modules/
+**/node_modules/
+.next/
+**/.next/
+out/
+**/out/
+out 2/
+**/out 2/
+dist/
+**/dist/
+build/
+**/build/
+
+# TypeScript cache
+*.tsbuildinfo
+**/*.tsbuildinfo
+
+# Local databases
+*.db
+*.db-wal
+*.db-shm
+
+# Environment files
 .env
 .env.*
 !.env.example
 
-**/out/
-**/out 2/
-**/.next/
-**/tsconfig.tsbuildinfo
-**/*.db-wal
-**/*.db-shm
-*.db-wal
-*.db-shm
-
-dist/
-build/
-*.db
-*.sqlite
-*.sqlite3
+# macOS
 .DS_Store
-*.db
-*.db-wal
-*.db-shm
