@@ -364,7 +364,16 @@ export const corsOptions = {
       const parsedOrigin = new URL(origin);
       const hostname = parsedOrigin.hostname;
 
-      if (hostname === 'localhost' || hostname.endsWith('.local') || isAllowedPrivateIp(hostname)) {
+      const allowedPublicOrigins = new Set([
+        'https://pos-psi-brown.vercel.app',
+      ]);
+
+      if (
+        allowedPublicOrigins.has(parsedOrigin.origin) ||
+        hostname === 'localhost' ||
+        hostname.endsWith('.local') ||
+        isAllowedPrivateIp(hostname)
+      ) {
         return callback(null, true);
       }
       
