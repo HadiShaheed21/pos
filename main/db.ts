@@ -371,6 +371,15 @@ export function getDbPath(): string {
   // Native Playwright owns this path for its disposable local Electron run.
   // It is intentionally opt-in and has no effect on normal desktop installs.
   if (process.env.FLO_E2E_DB_PATH) return path.resolve(process.env.FLO_E2E_DB_PATH);
+
+  // A Railway Volume exposes its mount point at runtime. Keeping the database
+  // beside that mount makes the POS state survive container replacements.
+  const configuredPath = process.env.FLO_DB_PATH?.trim()
+    || (process.env.RAILWAY_VOLUME_MOUNT_PATH?.trim()
+      ? path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH, 'flo.db')
+      : undefined);
+  if (configuredPath) return path.resolve(configuredPath);
+
   const projectRoot = path.basename(path.dirname(__dirname)) === 'dist'
     ? path.resolve(__dirname, '../..')
     : path.resolve(__dirname, '..');
@@ -379,6 +388,13 @@ export function getDbPath(): string {
 }
 
 function getBackupDir(): string {
+  const configuredPath = process.env.FLO_BACKUP_DIR?.trim();
+  if (configuredPath) return path.resolve(configuredPath);
+
+  if (process.env.FLO_DB_PATH?.trim() || process.env.RAILWAY_VOLUME_MOUNT_PATH?.trim()) {
+    return path.join(path.dirname(getDbPath()), 'backups');
+  }
+
   const userDataPath = app.getPath('userData');
   return path.join(userDataPath, 'backups');
 }
@@ -630,6 +646,9 @@ export function initDatabase(recoverInterruptedReplacement = true, allowDuringSh
   const dbPath = getDbPath();
   const backupDir = getBackupDir();
 
+  // SQLite creates a missing database file itself, but not its parent directory.
+  // The Railway Volume is mounted at /data only when the container starts.
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir, { recursive: true });
   }
